@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Генератор приглашений — Булат & Азалия</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&family=Tenor+Sans&display=swap" rel="stylesheet">
+<style>
+:root{--g:#4a6741;--g2:#3a5232;--c:#f5ede0;--t:#2c2416;--mu:#7a6a52}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--c);font-family:'Tenor Sans',sans-serif;color:var(--t);padding:20px 16px 100px}
+h1{font-family:'Playfair Display',serif;font-style:italic;font-size:26px;color:var(--g2);text-align:center;margin-bottom:4px}
+.sub{text-align:center;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--mu);margin-bottom:28px}
+.card{background:#fff;border-radius:2px;padding:20px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.card-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--g);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:.5px;background:rgba(74,103,65,.2)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--mu);margin-bottom:6px}
+input[type=text],textarea{width:100%;padding:11px 14px;border:1px solid rgba(74,103,65,.2);background:var(--c);font-family:'Tenor Sans',sans-serif;font-size:14px;color:var(--t);outline:none;transition:border-color .2s}
+input[type=text]:focus,textarea:focus{border-color:var(--g)}
+textarea{resize:vertical;line-height:1.7}
+
+/* Add tabs */
+.input-tabs{display:flex;gap:1px;margin-bottom:12px}
+.input-tab{flex:1;padding:8px;border:1px solid rgba(74,103,65,.2);background:transparent;font-family:'Tenor Sans',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);cursor:pointer;transition:all .15s}
+.input-tab.on{background:var(--g);color:#fff;border-color:var(--g)}
+
+.name-row{display:flex;gap:8px;margin-bottom:8px}
+.name-row input{flex:1}
+.add-btn{padding:11px 16px;background:var(--g);border:none;color:#fff;font-family:'Tenor Sans',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background .2s;flex-shrink:0}
+.add-btn:hover{background:var(--g2)}
+.bulk-btn{width:100%;padding:11px;background:var(--g);border:none;color:#fff;font-family:'Tenor Sans',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:6px}
+.bulk-btn:hover{background:var(--g2)}
+
+.names-list{list-style:none;margin-bottom:8px}
+.names-list li{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(74,103,65,.08);font-size:14px}
+.names-list li:last-child{border-bottom:none}
+.names-list .n{flex:1}
+.names-list .del{background:none;border:none;color:rgba(74,103,65,.3);cursor:pointer;font-size:16px;padding:0 4px;line-height:1}
+.names-list .del:hover{color:#c0392b}
+.name-count{font-size:10px;color:var(--mu);margin-bottom:8px}
+
+/* Lang */
+.lang-tabs{display:flex;gap:1px;margin-bottom:12px}
+.lt{flex:1;padding:8px;border:1px solid rgba(74,103,65,.2);background:transparent;font-family:'Tenor Sans',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);cursor:pointer;transition:all .15s}
+.lt.on{background:var(--g);color:#fff;border-color:var(--g)}
+
+.hint{font-size:10px;color:var(--mu);font-style:italic;margin-top:-6px;margin-bottom:10px}
+
+.gen-btn{width:100%;padding:14px;background:var(--g);border:none;color:#fff;font-family:'Tenor Sans',sans-serif;font-size:10px;letter-spacing:5px;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.gen-btn:hover{background:var(--g2)}
+.gen-btn:disabled{opacity:.5;cursor:wait}
+
+/* Results */
+#results{display:none;margin-top:16px}
+.result-item{background:#fff;border-radius:2px;padding:16px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.r-name{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:var(--g2);margin-bottom:8px}
+.r-urls{margin-bottom:10px}
+.r-url-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.r-url-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);width:60px;flex-shrink:0}
+.r-url-val{font-size:12px;color:var(--t);word-break:break-all;flex:1;padding:6px 10px;background:var(--c);border-left:2px solid rgba(74,103,65,.3)}
+.r-url-val.short{color:var(--g2);font-weight:600;font-size:13px}
+.loading{font-size:11px;color:var(--mu);font-style:italic;padding:6px 10px}
+.r-msg{font-size:12px;color:var(--t);line-height:1.75;white-space:pre-wrap;margin-bottom:10px;padding:10px;background:#f9f5ef;border-left:2px solid rgba(74,103,65,.25);font-style:italic;max-height:140px;overflow-y:auto}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{padding:8px 12px;border:1px solid rgba(74,103,65,.3);background:transparent;color:var(--g);font-family:'Tenor Sans',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.btn:hover,.btn.ok{background:var(--g);color:#fff;border-color:var(--g)}
+.btn-wa{background:#25D366;color:#fff;border-color:#25D366}
+.btn-wa:hover{background:#1da851;border-color:#1da851}
+.copy-all{width:100%;padding:12px;margin-top:12px;background:transparent;border:2px solid var(--g);color:var(--g);font-family:'Tenor Sans',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.copy-all:hover{background:var(--g);color:#fff}
+</style>
+</head>
+<body>
+
+<h1>Генератор приглашений</h1>
+<div class="sub">Булат & Азалия · 26.06.2026</div>
+
+<!-- Сайт -->
+<div class="card">
+  <div class="card-title">Адрес сайта</div>
+  <input type="text" id="siteUrl" value="https://moonlight2629.github.io/wedding">
+</div>
+
+<!-- Имена -->
+<div class="card">
+  <div class="card-title">Список гостей</div>
+
+  <div class="input-tabs">
+    <button class="input-tab on" onclick="switchTab('one',this)">По одному</button>
+    <button class="input-tab" onclick="switchTab('bulk',this)">Списком</button>
+  </div>
+
+  <!-- Один -->
+  <div id="tabOne">
+    <div class="name-row">
+      <input type="text" id="nameInput" placeholder="Имя гостя" onkeydown="if(event.key==='Enter')addOne()">
+      <button class="add-btn" onclick="addOne()">+ Добавить</button>
+    </div>
+  </div>
+
+  <!-- Список -->
+  <div id="tabBulk" style="display:none">
+    <div class="field">
+      <label>Введите имена — каждое с новой строки</label>
+      <textarea id="bulkInput" rows="6" placeholder="Айгуль&#10;Марат&#10;Рамиль&#10;Гүзәл&#10;Ильдар"></textarea>
+    </div>
+    <button class="bulk-btn" onclick="addBulk()">Добавить всех</button>
+  </div>
+
+  <div class="name-count" id="nameCount" style="margin-top:10px"></div>
+  <ul class="names-list" id="namesList"></ul>
+</div>
+
+<!-- Сообщение -->
+<div class="card">
+  <div class="card-title">Текст сообщения</div>
+  <div class="lang-tabs">
+    <button class="lt on" onclick="setLang('both',this)">Два языка</button>
+    <button class="lt" onclick="setLang('tt',this)">Татарский</button>
+    <button class="lt" onclick="setLang('ru',this)">Русский</button>
+  </div>
+  <textarea id="msgText" rows="10"></textarea>
+  <div class="hint" style="margin-top:6px">{имя} → имя гостя · {ссылка} → короткая ссылка</div>
+</div>
+
+<button class="gen-btn" id="genBtn" onclick="generate()">Сгенерировать приглашения</button>
+
+<!-- Результаты -->
+<div id="results">
+  <div class="card-title" style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--g);margin:16px 0 12px;padding:0">Готовые приглашения</div>
+  <div id="resultsList"></div>
+  <button class="copy-all" onclick="copyAllUrls()">Скопировать все ссылки</button>
+</div>
+
+<script>
+var names = [];
+var shortUrls = {};
+
+var MSGS = {
+  both: 'Кадерле, {имя}! 🌿\n\nСезне безнең өчен мөһим булган көнне бергә уздырырга чакырабыз.\n\n📅 26 июнь 2026, Пятница\n⏰ 17:00\n📍 Эмиз, Сафиуллина ур. 29\n\nШәхси чакыруыгыз:\n{ссылка}\n\n———\n\nДобрый день, {имя}!\n\nПриглашаем провести вместе важный для нас день.\n\n📅 26 июня 2026, пятница\n⏰ 17:00\n📍 Эмиз, ул. Сафиуллина 29\n\nВаше приглашение:\n{ссылка}',
+  tt: 'Кадерле, {имя}! 🌿\n\nСезне безнең өчен мөһим булган көнне бергә уздырырга чакырабыз.\n\n📅 26 июнь 2026, Пятница\n⏰ 17:00\n📍 Эмиз банкет залы\nСафиуллина ур. 29\n\nШәхси чакыруыгыз:\n{ссылка}',
+  ru: 'Добрый день, {имя}! 🌿\n\nПриглашаем провести вместе важный для нас день.\n\n📅 26 июня 2026, пятница\n⏰ 17:00\n📍 Банкетный зал Эмиз\nул. Сафиуллина 29\n\nВаше приглашение:\n{ссылка}'
+};
+
+document.getElementById('msgText').value = MSGS.both;
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.input-tab').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById('tabOne').style.display = tab === 'one' ? 'block' : 'none';
+  document.getElementById('tabBulk').style.display = tab === 'bulk' ? 'block' : 'none';
+}
+
+function setLang(l, btn) {
+  document.querySelectorAll('.lt').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById('msgText').value = MSGS[l];
+}
+
+function addOne() {
+  var v = document.getElementById('nameInput').value.trim();
+  if (!v) return;
+  if (names.indexOf(v) === -1) names.push(v);
+  document.getElementById('nameInput').value = '';
+  document.getElementById('nameInput').focus();
+  renderNames();
+}
+
+function addBulk() {
+  var lines = document.getElementById('bulkInput').value.split('\n');
+  lines.forEach(function(line) {
+    var v = line.trim();
+    if (v && names.indexOf(v) === -1) names.push(v);
+  });
+  document.getElementById('bulkInput').value = '';
+  renderNames();
+}
+
+function removeName(i) {
+  names.splice(i, 1);
+  renderNames();
+}
+
+function renderNames() {
+  var ul = document.getElementById('namesList');
+  var cnt = document.getElementById('nameCount');
+  cnt.textContent = names.length ? 'Гостей: ' + names.length : '';
+  ul.innerHTML = names.map(function(n, i) {
+    return '<li><span class="n">' + n + '</span><button class="del" onclick="removeName(' + i + ')">×</button></li>';
+  }).join('');
+}
+
+function makeUrl(name) {
+  var base = document.getElementById('siteUrl').value.trim().replace(/\/$/, '');
+  // Don't encode Cyrillic — keeps URL short and readable
+  return base + '/?name=' + name.trim();
+}
+
+// Shorten: try clck.ru (Russia) → is.gd → original
+function shorten(url, cb) {
+  // clck.ru — works in Russia without VPN
+  fetch('https://clck.ru/--?url=' + encodeURIComponent(url))
+    .then(function(r){ return r.text(); })
+    .then(function(t){
+      t = t.trim();
+      if(t && t.startsWith('http')){ cb(t); return; }
+      throw new Error('bad');
+    })
+    .catch(function(){
+      // Fallback: is.gd
+      fetch('https://is.gd/create.php?format=json&url=' + encodeURIComponent(url))
+        .then(function(r){ return r.json(); })
+        .then(function(d){ cb(d.shorturl || url); })
+        .catch(function(){ cb(url); }); // final fallback: original
+    });
+}
+
+function makeMsg(name, url) {
+  var tpl = document.getElementById('msgText').value;
+  return tpl.replace(/\{имя\}/g, name).replace(/\{ссылка\}/g, url);
+}
+
+function generate() {
+  if (!names.length) { alert('Добавьте хотя бы одно имя'); return; }
+  var btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.textContent = 'Сокращаем ссылки...';
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('resultsList').innerHTML = names.map(function(name, i) {
+    return '<div class="result-item" id="ri'+i+'">' +
+      '<div class="r-name">'+name+'</div>' +
+      '<div class="loading">⏳ Сокращаем ссылку...</div>' +
+      '</div>';
+  }).join('');
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+
+  var done = 0;
+  names.forEach(function(name, i) {
+    var longUrl = makeUrl(name);
+    shorten(longUrl, function(shortUrl) {
+      shortUrls[name] = shortUrl;
+      var msg = makeMsg(name, shortUrl);
+      var waText = encodeURIComponent(msg);
+      var el = document.getElementById('ri'+i);
+      el.innerHTML = [
+        '<div class="r-name">'+name+'</div>',
+        '<div class="r-urls">',
+          '<div class="r-url-row">',
+            '<span class="r-url-label">Короткая</span>',
+            '<span class="r-url-val short">'+shortUrl+'</span>',
+          '</div>',
+        '</div>',
+        '<div class="r-msg" id="rm'+i+'">'+msg.replace(/</g,'&lt;').replace(/\n/g,'<br>')+'</div>',
+        '<div class="btn-row">',
+          '<button class="btn" id="bs'+i+'" onclick="cp(\''+shortUrl+'\',\'bs'+i+'\')">Копировать ссылку</button>',
+          '<button class="btn" id="bm'+i+'" onclick="cpMsg('+i+',\'bm'+i+'\')">Копировать сообщение</button>',
+          '<a class="btn btn-wa" href="https://wa.me/?text='+waText+'" target="_blank">',
+            '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.51 3.58 1.39 5.06L2 22l5.06-1.38C8.43 21.49 10.17 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.93 13.44c-.21.58-1.21 1.11-1.67 1.17-.43.06-.97.08-1.56-.1-.36-.11-.82-.26-1.41-.51-2.47-1.07-4.08-3.56-4.21-3.73-.13-.17-1.04-1.38-1.04-2.64 0-1.26.66-1.88.9-2.13.24-.25.52-.31.69-.31h.5c.16 0 .38-.06.59.45l.78 1.9c.06.13.1.28.02.45l-.36.42c-.12.12-.24.25-.1.49.14.24.61.99 1.31 1.61.9.8 1.66 1.05 1.9 1.17.24.12.38.1.52-.06l.75-.93c.16-.24.32-.2.54-.12l1.63.78c.24.12.4.18.46.28.06.1.06.58-.15 1.16z"/></svg>',
+            'WhatsApp',
+          '</a>',
+        '</div>',
+      ].join('');
+      done++;
+      if (done === names.length) {
+        btn.disabled = false;
+        btn.textContent = 'Сгенерировать приглашения';
+      }
+    });
+  });
+}
+
+function cp(text, btnId) {
+  navigator.clipboard.writeText(text).then(function() {
+    var b = document.getElementById(btnId);
+    var orig = b.textContent; b.textContent='✓ Скопировано'; b.classList.add('ok');
+    setTimeout(function(){ b.textContent=orig; b.classList.remove('ok'); }, 2000);
+  });
+}
+
+function cpMsg(i, btnId) {
+  var el = document.getElementById('rm'+i);
+  // Get text content (strip HTML)
+  var tmp = document.createElement('div');
+  tmp.innerHTML = el.innerHTML.replace(/<br\s*\/?>/gi,'\n');
+  var text = tmp.textContent || tmp.innerText;
+  cp(text, btnId);
+}
+
+function copyAllUrls() {
+  var lines = names.map(function(n) {
+    return n + ': ' + (shortUrls[n] || makeUrl(n));
+  }).join('\n');
+  navigator.clipboard.writeText(lines).then(function() {
+    var b = document.querySelector('.copy-all');
+    b.textContent='✓ Все ссылки скопированы!';
+    setTimeout(function(){ b.textContent='Скопировать все ссылки'; }, 2500);
+  });
+}
+</script>
+</body>
+</html>
