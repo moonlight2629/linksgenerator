@@ -197,23 +197,9 @@ function makeUrl(name) {
   return base + '/?name=' + name.trim();
 }
 
-// Shorten: try clck.ru (Russia) → is.gd → original
+// No shortener — clean readable URL, works everywhere without VPN
 function shorten(url, cb) {
-  // clck.ru — works in Russia without VPN
-  fetch('https://clck.ru/--?url=' + encodeURIComponent(url))
-    .then(function(r){ return r.text(); })
-    .then(function(t){
-      t = t.trim();
-      if(t && t.startsWith('http')){ cb(t); return; }
-      throw new Error('bad');
-    })
-    .catch(function(){
-      // Fallback: is.gd
-      fetch('https://is.gd/create.php?format=json&url=' + encodeURIComponent(url))
-        .then(function(r){ return r.json(); })
-        .then(function(d){ cb(d.shorturl || url); })
-        .catch(function(){ cb(url); }); // final fallback: original
-    });
+  cb(url);
 }
 
 function makeMsg(name, url) {
@@ -228,12 +214,7 @@ function generate() {
   btn.textContent = 'Сокращаем ссылки...';
 
   document.getElementById('results').style.display = 'block';
-  document.getElementById('resultsList').innerHTML = names.map(function(name, i) {
-    return '<div class="result-item" id="ri'+i+'">' +
-      '<div class="r-name">'+name+'</div>' +
-      '<div class="loading">⏳ Сокращаем ссылку...</div>' +
-      '</div>';
-  }).join('');
+  document.getElementById('resultsList').innerHTML = '';
   document.getElementById('results').scrollIntoView({behavior:'smooth'});
 
   var done = 0;
@@ -248,7 +229,7 @@ function generate() {
         '<div class="r-name">'+name+'</div>',
         '<div class="r-urls">',
           '<div class="r-url-row">',
-            '<span class="r-url-label">Короткая</span>',
+            '<span class="r-url-label">Ссылка</span>',
             '<span class="r-url-val short">'+shortUrl+'</span>',
           '</div>',
         '</div>',
