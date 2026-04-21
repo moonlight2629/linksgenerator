@@ -193,8 +193,8 @@ function renderNames() {
 
 function makeUrl(name) {
   var base = document.getElementById('siteUrl').value.trim().replace(/\/$/, '');
-  // Don't encode Cyrillic — keeps URL short and readable
-  return base + '/?name=' + name.trim();
+  var encoded = name.trim().replace(/ /g, '+');
+  return base + '/?name=' + encoded;
 }
 
 // No shortener — clean readable URL, works everywhere without VPN
